@@ -1,0 +1,36 @@
+{
+  "title": "GCX Pulse Dashboard",
+  "csvUrl": "PASTE_YOUR_PUBLISHED_CSV_URL_HERE",
+
+  "thresholds": {
+    "greenMin": 4.2,
+    "amberMin": 3.6
+  },
+
+  "columns": {
+    "timestamp": "Timestamp",
+    "role": "Role",
+    "level": "Level"
+  },
+
+  "questions": [
+    { "id": "q1", "col": "Q1: I understand why I was placed in my current role." },
+    { "id": "q2", "col": "Q2: I understand what success looks like in my role over the next 90 days." },
+    { "id": "q3", "col": "Q3: I understand how my role contributes to GCX becoming a Value Center." },
+    { "id": "q4", "col": "Q4: I understand what differentiates performance expectations across levels (e.g., L18 vs L19)." },
+    { "id": "q5", "col": "Q5: The new ways of working in my team are clear." },
+    { "id": "q6", "col": "Q6: Decision-making and priorities are clear in the new structure." },
+    { "id": "q7", "col": "Q7: My workload feels manageable during this transition." },
+    { "id": "q8", "col": "Q8: I have received sufficient training for my new responsibilities." },
+    { "id": "q9", "col": "Q9: I feel confident performing the core requirements of my new role." },
+    { "id": "q10", "col": "Q10: I know where to go if I need support." },
+    { "id": "q11", "col": "Q11: I believe placements were handled fairly." },
+    { "id": "q12", "col": "Q12: I believe leveling decisions were applied consistently." },
+    { "id": "q13", "col": "Q13: I feel valued in the new structure." },
+    { "id": "q14", "col": "Q14: I understand what I need to demonstrate to progress to the next level." },
+    { "id": "q15", "col": "Q15: I feel motivated by the direction of this transformation." },
+    { "id": "q16", "col": "Q16: I feel optimistic about GCX’s future." },
+    { "id": "q17", "col": "Q17: I see myself here 12 months from now." },
+    { "id": "q18", "col": "Q18: I would recommend GCX as a place to build a career." }
+  ]
+}
