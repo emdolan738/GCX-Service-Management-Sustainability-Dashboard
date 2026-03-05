@@ -3,363 +3,367 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Pulse Dashboard</title>
+  <title>GCX Pulse Dashboard 2026</title>
 
-  <!-- Minimal “slick” styling -->
-  <style>
-    :root { --bg:#0b1020; --card:#121a33; --muted:#9aa6c2; --text:#e8eefc; --line:#253055; }
-    *{ box-sizing:border-box; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    body{ margin:0; background: radial-gradient(1000px 700px at 20% 0%, #17224a 0%, var(--bg) 50%); color:var(--text); }
-    .wrap{ max-width:1200px; margin:0 auto; padding:28px 18px 48px; }
-    h1{ margin:0 0 6px; font-size:28px; letter-spacing:.2px; }
-    .sub{ color:var(--muted); margin:0 0 18px; }
-    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:14px 16px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.25);
-    }
-    .kpi{ flex:1; min-width:220px; }
-    .kpi .label{ color:var(--muted); font-size:12px; }
-    .kpi .value{ font-size:30px; font-weight:700; margin-top:6px; }
-    .filters{ margin:14px 0 10px; }
-    select{
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      outline:none;
-      min-width:180px;
-    }
-    .pill{ display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px; font-weight:600; font-size:13px; }
-    .g{ background: rgba(0,255,170,.10); border:1px solid rgba(0,255,170,.25); color:#65ffd2;}
-    .a{ background: rgba(255,200,0,.10); border:1px solid rgba(255,200,0,.25); color:#ffd36a;}
-    .r{ background: rgba(255,80,110,.10); border:1px solid rgba(255,80,110,.25); color:#ff92a8;}
-    .grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px; }
-    @media(min-width: 900px){ .grid{ grid-template-columns: 1fr 1fr; } }
-    table{ width:100%; border-collapse:collapse; }
-    th, td{ padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); vertical-align:top; }
-    th{ text-align:left; color:var(--muted); font-size:12px; font-weight:600; }
-    .small{ color:var(--muted); font-size:12px; }
-    .bar{ height:10px; border-radius:999px; background: rgba(255,255,255,.10); overflow:hidden; }
-    .bar > div{ height:100%; border-radius:999px; background: rgba(120,170,255,.9); width:0%; transition:width .3s ease; }
-    .err{ color:#ff92a8; }
-    .footer{ margin-top:14px; color:var(--muted); font-size:12px; }
-    canvas{ width:100% !important; height:260px !important; }
-  </style>
-
-  <!-- Libraries (CDN, no build tools) -->
+  <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root { 
+      --bg: #0b1020; 
+      --card: #121a33; 
+      --muted: #9aa6c2; 
+      --text: #e8eefc; 
+      --accent: #78aaff;
+      --green: #65ffd2;
+      --amber: #ffd36a;
+      --red: #ff92a8;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+    
+    * { box-sizing: border-box; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    
+    body { 
+      margin: 0; 
+      background: radial-gradient(1000px 700px at 20% 0%, #17224a 0%, var(--bg) 50%); 
+      color: var(--text); 
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 18px 48px; }
+
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-end; 
+      margin-bottom: 24px; 
+      border-bottom: 1px solid var(--glass-border); 
+      padding-bottom: 16px; 
+    }
+    
+    h1 { margin: 0; font-size: 26px; letter-spacing: -0.5px; font-weight: 800; }
+    .sync-time { font-size: 12px; color: var(--muted); }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 8px; }
+    .value { font-size: 38px; font-weight: 800; color: #fff; }
+    
+    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    select {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      min-width: 240px;
+      cursor: pointer;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    select:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); }
+
+    .pill { padding: 5px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; display: inline-block; text-transform: uppercase; }
+    .g { background: rgba(101,255,210,0.1); color: var(--green); border: 1px solid rgba(101,255,210,0.3); }
+    .a { background: rgba(255,211,106,0.1); color: var(--amber); border: 1px solid rgba(255,211,106,0.3); }
+    .r { background: rgba(255,146,168,0.1); color: var(--red); border: 1px solid rgba(255,146,168,0.3); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 24px; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+    th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--glass-border); }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .risk-item { margin-bottom: 24px; }
+    .risk-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 16px; }
+    .risk-text { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.4; }
+    .risk-score { font-weight: 800; font-size: 15px; }
+    
+    .bar-outer { height: 8px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; }
+    .bar-inner { height: 100%; background: var(--accent); border-radius: 10px; transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    .chart-container { position: relative; height: 260px; width: 100%; }
+
+    #error-box { 
+      background: rgba(255,80,110,0.1); 
+      border: 1px solid var(--red); 
+      color: var(--red); 
+      padding: 16px; 
+      border-radius: 12px; 
+      margin-bottom: 24px; 
+      display: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <h1 id="title">Pulse Dashboard</h1>
-    <p class="sub">Traffic lights across roles/levels + stabilization trend.</p>
 
-    <div class="row">
-      <div class="card kpi">
-        <div class="label">Responses (filtered)</div>
-        <div class="value" id="kpiResponses">—</div>
+  <div class="wrap">
+    <header>
+      <h1 id="title">GCX Pulse Dashboard</h1>
+      <div class="sync-time" id="sync-time">Initializing...</div>
+    </header>
+
+    <div id="error-box"></div>
+
+    <div class="kpi-row">
+      <div class="card">
+        <div class="label">Total Responses</div>
+        <div class="value" id="kpi-n">—</div>
       </div>
-      <div class="card kpi">
-        <div class="label">Overall average (filtered)</div>
-        <div class="value" id="kpiAvg">—</div>
+      <div class="card">
+        <div class="label">Overall Score</div>
+        <div class="value" id="kpi-avg">—</div>
       </div>
-      <div class="card kpi">
-        <div class="label">Overall status</div>
-        <div class="value" style="font-size:16px; margin-top:10px" id="kpiRag">—</div>
+      <div class="card">
+        <div class="label">Sentiment Status</div>
+        <div id="kpi-status" style="margin-top:12px">—</div>
       </div>
     </div>
 
-    <div class="row filters">
-      <select id="roleFilter"></select>
-      <select id="levelFilter"></select>
-      <span class="small" id="lastUpdated"></span>
+    <div class="filters">
+      <select id="role-filter"><option>Loading...</option></select>
+      <select id="team-filter"><option>Loading...</option></select>
     </div>
 
     <div class="grid">
       <div class="card">
-        <div class="row" style="justify-content:space-between;">
-          <div>
-            <div style="font-weight:700">Stabilization Trend</div>
-            <div class="small">Daily average (filtered)</div>
-          </div>
-        </div>
-        <canvas id="trendChart"></canvas>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:700">Top 5 Risk Questions</div>
-        <div class="small">Lowest averages (filtered)</div>
-        <div id="riskList" style="margin-top:10px"></div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:700">RAG by Role</div>
-        <div class="small">Based on overall average per response</div>
-        <div style="margin-top:10px; overflow:auto;">
-          <table id="roleTable"></table>
+        <div class="label" style="margin-bottom:20px;">Sentiment Trend</div>
+        <div class="chart-container">
+          <canvas id="chart-trend"></canvas>
         </div>
       </div>
 
       <div class="card">
-        <div style="font-weight:700">RAG by Level</div>
-        <div class="small">Watch L18 vs L19 deltas</div>
-        <div style="margin-top:10px; overflow:auto;">
-          <table id="levelTable"></table>
+        <div class="label" style="margin-bottom:20px;">Focus Areas (Lowest Scores)</div>
+        <div id="risk-container"></div>
+      </div>
+
+      <div class="card">
+        <div class="label" style="margin-bottom:10px;">Scores by Role / Level</div>
+        <div style="overflow-x: auto;">
+          <table id="table-role"></table>
         </div>
       </div>
-    </div>
 
-    <div class="footer">
-      RAG thresholds are set in <code>config.json</code>. Update your column header mappings there.
-      If the dashboard shows “—”, it usually means the column names don’t match exactly.
-      <div id="error" class="err" style="margin-top:10px;"></div>
+      <div class="card">
+        <div class="label" style="margin-bottom:10px;">Scores by Team</div>
+        <div style="overflow-x: auto;">
+          <table id="table-team"></table>
+        </div>
+      </div>
     </div>
   </div>
 
 <script>
-  let CONFIG = null;
-  let RAW = [];
-  let trendChart = null;
+  /**
+   * Configuration with YOUR ACTUAL Google Sheets link
+   */
+  const CONFIG = {
+    "title": "GCX Pulse Dashboard 2026",
+    "csvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7h3efOLAnxhD58fxFZaDC4DojTizyesVqOjY4HLQxfMWBw4hEluAKnATe33qq2gEkQrY3xM-RSKlu/pub?output=csv",
+    "thresholds": {
+      "greenMin": 4.2,
+      "amberMin": 3.6
+    },
+    "columns": {
+      "timestamp": "Timestamp",
+      "role": "What is your current role/ level?",
+      "team": "What is your new team?"
+    },
+    "questions": [
+      { "id": "q1", "col": "I feel able to perform effectively in my new role." },
+      { "id": "q2", "col": "I have what I need (tools, access, information) to do my job well." },
+      { "id": "q3", "col": "I understand how my responsibilities have changed as part of this transition." },
+      { "id": "q4", "col": "The reasons for this change have been clearly explained." },
+      { "id": "q5", "col": "Communication during this transition has been consistent and clear" }
+    ]
+  };
 
-  function ragFromScore(avg) {
-    const g = CONFIG.thresholds.greenMin;
-    const a = CONFIG.thresholds.amberMin;
-    if (avg >= g) return { key:"GREEN", cls:"g" };
-    if (avg >= a) return { key:"AMBER", cls:"a" };
-    return { key:"RED", cls:"r" };
-  }
+  let RAW_DATA = [];
+  let chartInstance = null;
 
-  function pill(ragKey) {
-    const cls = ragKey === "GREEN" ? "g" : ragKey === "AMBER" ? "a" : "r";
-    return `<span class="pill ${cls}">${ragKey}</span>`;
-  }
+  const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
 
-  function mean(arr) {
-    const xs = arr.filter(v => typeof v === "number" && isFinite(v));
-    if (!xs.length) return null;
-    return xs.reduce((a,b)=>a+b,0) / xs.length;
-  }
+  const parseScore = (val) => {
+    if (!val) return null;
+    const n = parseInt(String(val).match(/\d+/));
+    return isNaN(n) ? null : n;
+  };
 
-  function parseNumber(v) {
-    if (v == null) return null;
-    const s = String(v).trim();
-    if (!s) return null;
-    const n = Number(s);
-    return isFinite(n) ? n : null;
-  }
+  const calculateMean = (arr) => {
+    const valid = arr.filter(v => v !== null && !isNaN(v));
+    return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
+  };
 
-  function uniqueSorted(values) {
-    return Array.from(new Set(values)).filter(Boolean).sort((a,b)=>String(a).localeCompare(String(b)));
-  }
+  const getStatus = (val) => {
+    if (val >= CONFIG.thresholds.greenMin) return { label: 'HEALTHY', class: 'g' };
+    if (val >= CONFIG.thresholds.amberMin) return { label: 'STABLE', class: 'a' };
+    return { label: 'CRITICAL', class: 'r' };
+  };
 
-  function groupBy(rows, keyFn) {
-    const m = {};
-    for (const r of rows) {
-      const k = keyFn(r) || "Unknown";
-      (m[k] = m[k] || []).push(r);
-    }
-    return m;
-  }
-
-  function overallAvgForRow(r) {
-    const vals = CONFIG.questions.map(q => r.answers[q.id]).filter(v => v != null);
-    return mean(vals);
-  }
-
-  function renderFilters(rows) {
-    const roleSel = document.getElementById("roleFilter");
-    const levelSel = document.getElementById("levelFilter");
-
-    const roles = ["All", ...uniqueSorted(rows.map(r => r.role))];
-    const levels = ["All", ...uniqueSorted(rows.map(r => r.level))];
-
-    roleSel.innerHTML = roles.map(x => `<option value="${x}">${x}</option>`).join("");
-    levelSel.innerHTML = levels.map(x => `<option value="${x}">${x}</option>`).join("");
-
-    roleSel.onchange = () => refresh();
-    levelSel.onchange = () => refresh();
-  }
-
-  function getFiltered() {
-    const role = document.getElementById("roleFilter").value;
-    const level = document.getElementById("levelFilter").value;
-
-    return RAW.filter(r =>
-      (role === "All" || r.role === role) &&
-      (level === "All" || r.level === level)
+  function updateDashboard() {
+    const roleVal = document.getElementById('role-filter').value;
+    const teamVal = document.getElementById('team-filter').value;
+    
+    const filtered = RAW_DATA.filter(d => 
+      (roleVal === 'All' || d.role === roleVal) && 
+      (teamVal === 'All' || d.team === teamVal)
     );
-  }
 
-  function renderKpis(filtered) {
-    document.getElementById("kpiResponses").textContent = filtered.length;
-
-    const avg = mean(filtered.map(r => r.overallAvg));
-    document.getElementById("kpiAvg").textContent = avg == null ? "—" : avg.toFixed(2);
-
-    if (avg == null) {
-      document.getElementById("kpiRag").innerHTML = pill("RED");
-    } else {
-      const rag = ragFromScore(avg);
-      document.getElementById("kpiRag").innerHTML = `<span class="pill ${rag.cls}">${rag.key}</span>`;
+    const overallScore = calculateMean(filtered.map(d => d.overallAvg));
+    document.getElementById('kpi-n').innerText = filtered.length;
+    document.getElementById('kpi-avg').innerText = overallScore ? overallScore.toFixed(2) : '—';
+    
+    if (overallScore) {
+      const status = getStatus(overallScore);
+      document.getElementById('kpi-status').innerHTML = `<span class="pill ${status.class}">${status.label}</span>`;
     }
 
-    const now = new Date();
-    document.getElementById("lastUpdated").textContent = "Updated: " + now.toLocaleString();
-  }
+    const questionStats = CONFIG.questions.map(q => ({
+      text: q.col,
+      avg: calculateMean(filtered.map(d => d.answers[q.id]))
+    })).sort((a, b) => (a.avg || 0) - (b.avg || 0));
 
-  function renderRiskList(filtered) {
-    const items = CONFIG.questions.map(q => {
-      const avg = mean(filtered.map(r => r.answers[q.id]));
-      return { q, avg };
-    }).sort((a,b) => (a.avg ?? -Infinity) - (b.avg ?? -Infinity)).slice(0,5);
-
-    const container = document.getElementById("riskList");
-    container.innerHTML = items.map(({q, avg}) => {
-      const val = avg == null ? "—" : avg.toFixed(2);
-      const rag = avg == null ? { key:"RED", cls:"r" } : ragFromScore(avg);
-      const pct = avg == null ? 0 : Math.max(0, Math.min(100, (avg/5)*100));
-
+    document.getElementById('risk-container').innerHTML = questionStats.slice(0, 4).map(q => {
+      const pct = q.avg ? (q.avg / 5) * 100 : 0;
+      const statusClass = q.avg ? getStatus(q.avg).class : 'r';
       return `
-        <div class="card" style="padding:12px; margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; gap:10px;">
-            <div style="flex:1;">
-              <div style="font-weight:650; font-size:14px;">${q.col}</div>
-              <div class="small">${val} / 5</div>
-              <div class="bar" style="margin-top:8px;"><div style="width:${pct}%"></div></div>
-            </div>
-            <div style="white-space:nowrap;">${pill(rag.key)}</div>
+        <div class="risk-item">
+          <div class="risk-info">
+            <span class="risk-text">${q.text}</span>
+            <span class="risk-score ${statusClass}">${q.avg ? q.avg.toFixed(1) : '—'}</span>
           </div>
-        </div>`;
-    }).join("");
+          <div class="bar-outer"><div class="bar-inner" style="width:${pct}%"></div></div>
+        </div>
+      `;
+    }).join('');
+
+    renderTable(filtered, 'role', 'table-role', 'Role / Level');
+    renderTable(filtered, 'team', 'table-team', 'New Team');
+    updateChart(filtered);
   }
 
-  function renderRagTable(rows, key, tableId) {
-    const groups = groupBy(rows, r => r[key]);
-    const entries = Object.entries(groups).map(([name, rs]) => {
-      const avg = mean(rs.map(r => r.overallAvg));
-      const rag = avg == null ? { key:"RED", cls:"r" } : ragFromScore(avg);
-      return { name, n: rs.length, avg, rag };
-    }).sort((a,b)=>a.name.localeCompare(b.name));
+  function renderTable(data, key, elementId, headerLabel) {
+    const groups = data.reduce((acc, row) => {
+      const val = row[key] || 'Not Specified';
+      acc[val] = acc[val] || [];
+      acc[val].push(row.overallAvg);
+      return acc;
+    }, {});
 
-    const table = document.getElementById(tableId);
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>${key.toUpperCase()}</th>
-          <th>Responses</th>
-          <th>Avg</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${entries.map(e => `
-          <tr>
-            <td>${e.name}</td>
-            <td>${e.n}</td>
-            <td>${e.avg == null ? "—" : e.avg.toFixed(2)}</td>
-            <td>${pill(e.rag.key)}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    `;
+    let html = `<thead><tr><th>${headerLabel}</th><th>Avg</th><th>Status</th></tr></thead><tbody>`;
+    Object.entries(groups).sort().forEach(([name, scores]) => {
+      const avg = calculateMean(scores);
+      const status = getStatus(avg);
+      html += `<tr>
+        <td>${name}</td>
+        <td>${avg ? avg.toFixed(2) : '—'}</td>
+        <td><span class="pill ${status.class}">${status.label}</span></td>
+      </tr>`;
+    });
+    document.getElementById(elementId).innerHTML = html + '</tbody>';
   }
 
-  function renderTrend(filtered) {
-    // group by date YYYY-MM-DD
-    const byDay = groupBy(filtered, r => r.timestamp.slice(0,10));
-    const pts = Object.entries(byDay).map(([day, rs]) => ({
-      day,
-      avg: mean(rs.map(x => x.overallAvg))
-    })).sort((a,b)=>a.day.localeCompare(b.day));
+  function updateChart(data) {
+    const dateGroups = data.reduce((acc, row) => {
+      acc[row.date] = acc[row.date] || [];
+      acc[row.date].push(row.overallAvg);
+      return acc;
+    }, {});
 
-    const labels = pts.map(p => p.day);
-    const data = pts.map(p => p.avg);
+    const sortedDates = Object.keys(dateGroups).sort();
+    const chartData = sortedDates.map(d => calculateMean(dateGroups[d]));
 
-    const ctx = document.getElementById("trendChart");
-    if (trendChart) trendChart.destroy();
-
-    trendChart = new Chart(ctx, {
-      type: "line",
+    if (chartInstance) chartInstance.destroy();
+    
+    const ctx = document.getElementById('chart-trend').getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
       data: {
-        labels,
+        labels: sortedDates,
         datasets: [{
-          label: "Daily Average",
-          data,
-          tension: 0.25,
-          borderWidth: 3,
-          pointRadius: 0
+          data: chartData,
+          borderColor: '#78aaff',
+          backgroundColor: 'rgba(120, 170, 255, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: '#78aaff',
+          borderWidth: 3
         }]
       },
       options: {
-        responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: true }
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: { min: 1, max: 5, ticks: { color: "rgba(232,238,252,.8)" }, grid: { color: "rgba(255,255,255,.08)" } },
-          x: { ticks: { color: "rgba(232,238,252,.8)" }, grid: { display: false } }
+          y: { min: 1, max: 5, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9aa6c2', stepSize: 1 } },
+          x: { ticks: { color: '#9aa6c2' }, grid: { display: false } }
         }
       }
     });
   }
 
-  function refresh() {
-    const filtered = getFiltered();
-    renderKpis(filtered);
-    renderRiskList(filtered);
-    renderRagTable(filtered, "role", "roleTable");
-    renderRagTable(filtered, "level", "levelTable");
-    renderTrend(filtered);
-  }
-
   async function init() {
     try {
-      const cfg = await fetch("./config.json", { cache: "no-store" }).then(r => r.json());
-      CONFIG = cfg;
-      document.getElementById("title").textContent = CONFIG.title || "Pulse Dashboard";
+      document.getElementById('title').innerText = CONFIG.title;
+      const csvRes = await fetch(CONFIG.csvUrl);
+      if (!csvRes.ok) throw new Error("Could not connect to the Google Sheet CSV.");
+      
+      const csvText = await csvRes.text();
+      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
 
-      if (!CONFIG.csvUrl || CONFIG.csvUrl.includes("PASTE_")) {
-        throw new Error("config.json: Please set csvUrl to your published Google Sheet CSV link.");
-      }
+      const sheetHeaders = Object.keys(parsed[0]);
+      const findHeader = (target) => sheetHeaders.find(h => normalize(h).includes(normalize(target))) || target;
 
-      const csvText = await fetch(CONFIG.csvUrl, { cache: "no-store" }).then(r => r.text());
-      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-
-      const rows = parsed.data;
-
-      // Build normalized rows
-      RAW = rows.map(r => {
-        const ts = (r[CONFIG.columns.timestamp] || "").toString();
-        const role = (r[CONFIG.columns.role] || "Unknown").toString().trim() || "Unknown";
-        const level = (r[CONFIG.columns.level] || "Unknown").toString().trim() || "Unknown";
-
+      RAW_DATA = parsed.map(row => {
         const answers = {};
-        for (const q of CONFIG.questions) {
-          answers[q.id] = parseNumber(r[q.col]);
-        }
-        const overallAvg = mean(Object.values(answers));
-        return { timestamp: ts, role, level, answers, overallAvg };
-      }).filter(r => r.timestamp); // basic validity
+        CONFIG.questions.forEach(q => { answers[q.id] = parseScore(row[findHeader(q.col)]); });
+        return {
+          role: row[findHeader(CONFIG.columns.role)] || 'Not Specified',
+          team: row[findHeader(CONFIG.columns.team)] || 'Not Specified',
+          date: (row[findHeader(CONFIG.columns.timestamp)] || '').split(' ')[0] || 'Unknown',
+          answers,
+          overallAvg: calculateMean(Object.values(answers))
+        };
+      }).filter(d => d.overallAvg !== null);
 
-      renderFilters(RAW);
-      refresh();
+      const setupFilter = (id, key) => {
+        const unique = ['All', ...new Set(RAW_DATA.map(d => d[key]))].sort();
+        document.getElementById(id).innerHTML = unique.map(v => `<option value="${v}">${v}</option>`).join('');
+        document.getElementById(id).onchange = updateDashboard;
+      };
+      
+      setupFilter('role-filter', 'role');
+      setupFilter('team-filter', 'team');
+      document.getElementById('sync-time').innerText = `Last Sync: ${new Date().toLocaleTimeString()}`;
+      updateDashboard();
 
-    } catch (e) {
-      document.getElementById("error").textContent = e.message || String(e);
-      console.error(e);
+    } catch (err) {
+      const box = document.getElementById('error-box');
+      box.style.display = 'block';
+      box.innerText = "Error: " + err.message;
     }
   }
 
-  init();
+  window.onload = init;
 </script>
 </body>
 </html>
